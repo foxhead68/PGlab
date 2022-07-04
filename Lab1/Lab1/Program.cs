@@ -130,7 +130,7 @@ namespace Lab1
                 String keepgoing = Console.ReadLine();
                 Console.WriteLine();
                 string[] words = Text.Split(new char[] { '.', ' ', ',', '!', '?', '\n', '\t', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-                //Convert Array of words into a List of words(strings).
+                
                 List<string> wordList = new List<string>(words);
                 Dictionary<string, int> dictionary = new Dictionary<string, int>(StringComparer.InvariantCultureIgnoreCase);
                 for (int i = 0; i < words.Length; i++)
