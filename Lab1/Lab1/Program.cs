@@ -49,7 +49,7 @@ namespace Lab1
                     }
                     else if (number >= min && number <= max)
                     {
-                        return number; //return an int
+                        return number; 
                     }
                     else
                     {
