@@ -10,78 +10,81 @@ namespace BlackjackClassLibrary
     public class Deck
     {
 
-        private List<Card> Card = new List<Card>();
-        private object createDeck;
+        protected List<Card> deckPile = new List<Card>();
 
+        
+        string[] Faces = { "A ", "K ", "Q ", "J ", "10", "9 ", "8 ", "7 ", "6 ", "5 ", "4 ", "3 ", "2 " };
+        Dictionary<string, int> FacesAndValues = new Dictionary<string, int>();
+        string[] Suits = { "\u2660", "\u2663", "\u2665", "\u2666" };
         public Deck()
         {
+           
 
-            for (int i = 0; i < 4; i++)
+            setDictionary();
+
+            for (int ndx = 0; ndx < Faces.Length; ndx++)
             {
-                for (int j = 0; j < 13; j++)
+                string faceHolder = Faces[ndx];
+
+                for (int index = 0; index < Suits.Length; index++)
                 {
-                    BlackJackCard blackJackCard = new BlackJackCard((CardFace)i, (CardSuit)j);
+                    Card card = new Card();
+                    card.Face = faceHolder;
+                    card.Suit = Suits[index];
+
+                    deckPile.Add(card);
                 }
-                Card.Add(Factory.CreateCard(CardFace.Ace, CardSuit.Clubs));
             }
-        }
-
-        public Deck(object createDeck)
-        {
-            this.createDeck = createDeck;
-        }
-
-        public List<Card> CreateDeck()
-        {
-            for (int i = 0; i < 4; i++)
+         
+            foreach (var card in FacesAndValues)
             {
-                for (int j = 0; j < 13; j++)
+                for (int ndx = 0; ndx < deckPile.Count; ndx++)
                 {
-
-                    BlackJackCard blackJackCard = new BlackJackCard((CardFace)i, (CardSuit)j);
+                    if (deckPile[ndx].Face == card.Key)
+                    {
+                        deckPile[ndx].Value = card.Value;
+                    }
                 }
-
             }
-            return Card;
         }
 
-        public Card Deal()
-        {
-            Card first = Card.Count > 0 ? Card[0] : null;
-            if (Card.Count > 0)
-            {
-                first = Card[0];
-                Card.RemoveAt(0);
-            }
-            else
-            {
-                Card = CreateDeck();
-                Shuffle();
-            }
-            return first;
-
-        }
         public void Shuffle()
         {
-            Random rand = new Random();
+            Card[] deckPileShuffleHolder = new Card[deckPile.Count];
 
-            int n = Card.Count;
-            int randSwitch = 0;
-            for (int i = 0; i < n; i--)
+            Random rng = new Random();
+
+            for (int ndx = 0; ndx < deckPile.Count; ndx++)
             {
+                int ranNum = rng.Next(ndx + 1);
 
-                randSwitch = rand.Next(n - 1) + 1;
-                Card on = Card[randSwitch];
-                Card[randSwitch] = Card[n - 1];
-                Card[n - 1] = on;
+                deckPileShuffleHolder[ndx] = deckPile[ndx];
+                deckPile[ndx] = deckPile[ranNum];
+                deckPile[ranNum] = deckPileShuffleHolder[ndx];
             }
         }
 
-
-
-        public void Print()
+        public Card Draw()
         {
-            for (int ndx = 0; ndx < Card.Count; ndx++)
+            Card hold = new Card();
+
+            
+            for (int ndx = 0; ndx < deckPile.Count; ndx++)
+            {
+                if (deckPile[ndx] != null)
+                {
+                    hold = deckPile[ndx];
+                    deckPile[ndx] = null;
+                    break;
+                }
+            }
+
+            return hold;
+        }
+
+        public void Display()
+        {
+            for (int ndx = 0; ndx < deckPile.Count; ndx++)
             {
                 if (ndx == 0)
                 {
@@ -93,7 +96,7 @@ namespace BlackjackClassLibrary
                     Console.Write(" ");
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.BackgroundColor = ConsoleColor.White;
-                    Console.Write($"| {Card[ndx].Face} - {Card[ndx].Suit} |");
+                    Console.Write($"| {deckPile[ndx].Face} - {deckPile[ndx].Suit} |");
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(" ");
@@ -103,10 +106,33 @@ namespace BlackjackClassLibrary
                     Console.Write(" ");
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.BackgroundColor = ConsoleColor.White;
-                    Console.WriteLine($"| {Card[ndx].Face} - {Card[ndx].Suit} |");
+                    Console.WriteLine($"| {deckPile[ndx].Face} - {deckPile[ndx].Suit} |");
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.Write(" ");
+                }
+            }
+        }
+
+        public void setDictionary()
+        {
+            int defaultValue = 11;
+
+            for (int ndx = 0; ndx < Faces.Length; ndx++)
+            {
+                if (defaultValue == 11)
+                {
+                    FacesAndValues.Add(Faces[ndx], (defaultValue));
+                    defaultValue--;
+                }
+                else if (ndx <= 4 && defaultValue == 10)
+                {
+                    FacesAndValues.Add(Faces[ndx], (defaultValue));
+                }
+                else
+                {
+                    defaultValue--;
+                    FacesAndValues.Add(Faces[ndx], (defaultValue));
                 }
             }
         }

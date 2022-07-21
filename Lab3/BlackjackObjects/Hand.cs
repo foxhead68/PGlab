@@ -7,41 +7,61 @@ using static BlackjackClassLibrary.CardSuit;
 
 namespace BlackjackClassLibrary
 {
-    class Hand
+    public class Hand
+    { 
+     private List<Card> _handDeck = new List<Card>();
+
+    public List<Card> handDeck
     {
+        get { return _handDeck; }
+        set { _handDeck = value; }
+    }
 
-        protected List<Card> _cards = new List<Card>();
+    private int _Score = 0;
 
-        public Hand(bool isDealer)
+    public int Score
+    {
+        get { return _Score; }
+        set { _Score = value; }
+    }
+
+    public void AddCard(Card card)
+    {
+        _handDeck.Add(card);
+    }
+
+    public int trackScore()
+    {
+        //Set it back to zero, then reiterate and add all the cards value again.
+        _Score = 0;
+
+        for (int ndx = 0; ndx < handDeck.Count; ndx++)
         {
-            IsDealer = isDealer;
-        }
-
-        public bool IsDealer { get; }
-
-        public virtual void AddCard(Card _card)
-
-        {
-            _cards.Add(_card);
-            _cards.Add(Factory.CreateCard(CardFace.Ace, CardSuit.Clubs));
-        }
-
-        public virtual void Print(int x, int y)
-        {
-            int originalPosition = x;
-            for (int i = 0; i < _cards.Count; i++)
+            if (handDeck[ndx] != null)
             {
-
-                
-                x += 6;
-                if (i % 5 == 0 && i != 0)
+                _Score += _handDeck[ndx].Value;
+            }
+        }
+        //Handling Ace
+        if (_Score > 21)
+        {
+            for (int i = 0; i < handDeck.Count; i++)
+            {
+                if (handDeck[i].Face == "A ")
                 {
-                    y += 3;
-                    x = originalPosition;
+                    _Score -= 10;
                 }
             }
         }
+
+        return _Score;
     }
+
+    public void resetHand()
+    {
+        _handDeck.Clear();
+    }
+}
 }
 
 

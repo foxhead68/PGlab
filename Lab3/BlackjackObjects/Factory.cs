@@ -13,14 +13,11 @@ namespace BlackjackClassLibrary
             Card card = new Card();
             return card;
         }
-
-        internal static Card CreateCard(CardFace ace, CardSuit clubs, CardFace cardFace)
-        {
-            Card card = new(face: cardFace, clubs);
-            return card;
-        }
     }
 }
+
+
+       
 
 
 

@@ -5,6 +5,8 @@ using PG2Input;
 using SolrNet.Utils;
 using Stripe;
 using Card = BlackjackClassLibrary.Card;
+using BlackjackClassLibrary;
+using FullSailCasino;
 
 namespace Lab3
 {
@@ -49,37 +51,128 @@ namespace Lab3
             
         Console.WriteLine();
 
-            int menuChoice = 0;
-            string[] mainMenu = new string[] { "1.Sample card", "2.Shuffle and Show Deck", "3.Sample Blackjack Hands", "4.Play Blackjack", "5.Exit" };
-            while (menuChoice != mainMenu.Length)
+            string[] menuOptions = { "1. Play Blackjack", "2. Shuffle and Show Deck", "3. Exit" };
+            int userChoice = 0;
+
+            bool willExit = false;
+
+            while (!willExit)
             {
-                ReadChoice("Please select an option: ", mainMenu, out menuChoice);
-                Console.WriteLine();
+                Deck baseDeck = new Deck();
+                Hand playerHand = new Hand();
+                Hand dealerHand = new Hand();
 
                 
-                switch (menuChoice)
+                baseDeck.Shuffle();
+               
+               
+                
+                ReadChoice("Choice: ", menuOptions, out userChoice);
+
+                
+                if (userChoice == 1)
                 {
-                    case 1:
-                        Console.WriteLine("\nYou Selected: Sample card ");
-                        break;
-                    case 2:
-                        Console.WriteLine("\nYou Selected: Shuffle and Show Deck");                     
-                        break;
-                    case 3:                        
-                        Console.WriteLine("\nYou Selected: Sample Blackjack Hands");
-                        
-                        break; 
-                Console.WriteLine();
-                        break;
-                    case 4:
-                        
-                        Console.WriteLine("\nYou Selected: Play BlackJack");
-                        break;
-                    case 5:
-                        Console.WriteLine("\nYou Selected: Exit");                       
-                        break;
+                    bool playerCondition = true;
+                    bool firstTurn = true;
+                    bool dealerInitilize = true;
+                    bool dealerPlay = false;
+
+                    Console.Clear();
+                   
+                    for (int ndx = 0; ndx < 2; ndx++)
+                    {
+                        playerHand.AddCard(baseDeck.Draw());
+                        dealerHand.AddCard(baseDeck.Draw());
+                    }
+
+                    
+                    string[] emptyArray = new string[] { string.Empty };
+                    while (playerCondition)
+                    {
+                        Console.Clear();
+                        BlackJackGame.DrawGame(playerHand, dealerHand, dealerInitilize, dealerPlay);
+                        if ((dealerHand.Score == 21 || playerHand.Score == 21) && firstTurn)
+                        {
+                            dealerPlay = true;
+                            dealerInitilize = false;
+                            Console.Clear();
+                            BlackJackGame.DrawGame(playerHand, dealerHand, dealerInitilize, dealerPlay);
+                            if (playerHand.Score == 21 && dealerHand.Score == 21)
+                            {
+                                BlackJackGame.stalemate("The dealer and player have 21.");
+                            }
+                            else if (dealerHand.Score == 21)
+                            {
+                                BlackJackGame.playerLost("Dealer has 21");
+                            }
+                            else if (playerHand.Score == 21)
+                            {
+                                BlackJackGame.playerWon("Player has 21");
+                            }
+                            dealerInitilize = true;
+                            BlackJackGame.endScene(ref baseDeck, ref playerHand, ref dealerHand, ref playerCondition, ref firstTurn, emptyArray);
+                        }
+                        else if (playerHand.Score < 21)
+                        {
+                            ReadChoice("Choice: ", emptyArray, out int gameplayChoice);
+                           
+                            if (gameplayChoice == 1)
+                            {
+                                playerHand.AddCard(baseDeck.Draw());
+                                firstTurn = false;
+                            }
+                            
+                            else if (gameplayChoice == 2)
+                            {
+                                dealerPlay = true;
+
+                                BlackJackGame.dealerTurn(playerHand, dealerHand, baseDeck);
+                                firstTurn = false;
+                                BlackJackGame.endScene(ref baseDeck, ref playerHand, ref dealerHand, ref playerCondition, ref firstTurn, emptyArray);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Input 1 or 2.");
+                            }
+                        }
+                        else if (playerHand.Score == 21 && !firstTurn)
+                        {
+                            Console.WriteLine("21 Attained, standing.");
+                            dealerPlay = true;
+
+                            BlackJackGame.dealerTurn(playerHand, dealerHand, baseDeck);
+                            BlackJackGame.endScene(ref baseDeck, ref playerHand, ref dealerHand, ref playerCondition, ref firstTurn, emptyArray);
+                        }
+                        else
+                        {
+                            BlackJackGame.playerLost("Player has busted!");
+                            BlackJackGame.endScene(ref baseDeck, ref playerHand, ref dealerHand, ref playerCondition, ref firstTurn, emptyArray);
+                        }
+                    }
                 }
-                static int ReadInteger(string prompt, int min, int max)
+              
+                else if (userChoice == 2)
+                {
+                    Console.WriteLine("Shuffled, showing deck.");
+                    baseDeck.Shuffle();
+
+                    baseDeck.Display();
+
+                    Console.ReadKey();
+                }
+               
+                else if (userChoice == 3)
+                {
+                    willExit = true;
+                }
+                else
+                {
+                    Console.Write("You input an invalid solution, try again.");
+                }
+                Console.Clear();
+            }
+        }
+        static int ReadInteger(string prompt, int min, int max)
                 {
                     bool valid = false;
                     int num = 0;
@@ -130,6 +223,6 @@ namespace Lab3
                 }
             }
         }
-    }
-}
+    
+
 
